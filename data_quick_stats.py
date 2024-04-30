@@ -1,3 +1,5 @@
+import pandas as pd
+
 #reading in data and metadata
 data = pd.read_csv("data.csv")
 meta_data = pd.read_csv("metadata.csv")
