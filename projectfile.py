@@ -14,6 +14,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import mpl_toolkits.mplot3d
 
+#reading in data and metadata
+data = pd.read_csv("data.csv")
+meta_data = pd.read_csv("metadata.csv")
+
 #getting Total Manufacturing in millions of dollars and cleaning df
 mtm = data.loc[data['time_series_code'] == 'MTM_TI_US_adj']
 print(mtm)
