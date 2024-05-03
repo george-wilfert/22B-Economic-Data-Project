@@ -28,3 +28,12 @@ mtm.date = pd.to_datetime(mtm['date'])
 
 #Creating lineplot
 sns.lineplot(data=mtm, x="date", y="value")
+
+#getting Balance of Payment Goods and Services Imports,  Millions of Dollars and cleaning df
+imp = data.loc[data['time_series_code'] == 'BOPGS_IMP_US_adj']
+imp = imp.drop('time_series_code', axis=1)
+
+imp['value'] = imp['value'].astype('int')
+imp.date = pd.to_datetime(imp['date'])
+
+sns.lineplot(data=imp, x="date", y="value")
