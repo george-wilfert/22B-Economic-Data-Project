@@ -37,3 +37,8 @@ imp['value'] = imp['value'].astype('int')
 imp.date = pd.to_datetime(imp['date'])
 
 sns.lineplot(data=imp, x="date", y="value")
+
+#combining data frames and making lineplot to print
+list_of_df = [imp,mtm]
+imported_and_manufacturing = pd.concat(list_of_df)
+sns.lineplot(data=imported_and_manufacturing, x="date",y="value")
