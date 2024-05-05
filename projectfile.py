@@ -59,3 +59,10 @@ data['value'] = pd.to_numeric(data['value'], errors="coerce")
 keys = ["Housing Units Completed", 'New Single-family House Sold',
         'Housing Units Under Construction', 'Housing Units Started',
         'Housing Units Authorized But Not Started', 'Annual Rate for Housing Units Authorized in Permit-Issuing Places']
+
+#any() returns True or False checks if key word is in in the row and then creating a new df
+filter_meta = filter(lambda x: any(key in x[1]['cat_desc'] for key in keys),meta_data.iterrows())
+housing_meta = pd.DataFrame([item[1] for item in filter_meta])
+
+#selects row from the metdata where 'cat_desc' had any of the key indicatoes
+time_series_codes = housing_meta['time_series_code'].tolist()
