@@ -38,6 +38,14 @@ imp.date = pd.to_datetime(imp['date'])
 
 sns.lineplot(data=imp, x="date", y="value")
 
+#changes value to numberic and coerces any NaN
+data['value'] = pd.to_numeric(data['value'], errors="coerce")
+
+#Key indicators. to filter from the metadata
+keys = ["Housing Units Completed", 'New Single-family House Sold',
+        'Housing Units Under Construction', 'Housing Units Started',
+        'Housing Units Authorized But Not Started', 'Annual Rate for Housing Units Authorized in Permit-Issuing Places']
+
 #combining data frames and making lineplot to print
 list_of_df = [imp,mtm]
 imported_and_manufacturing = pd.concat(list_of_df)
