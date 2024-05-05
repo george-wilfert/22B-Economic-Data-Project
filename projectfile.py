@@ -50,3 +50,12 @@ keys = ["Housing Units Completed", 'New Single-family House Sold',
 list_of_df = [imp,mtm]
 imported_and_manufacturing = pd.concat(list_of_df)
 sns.lineplot(data=imported_and_manufacturing, x="date",y="value")
+
+
+#changes value to numberic and coerces any NaN
+data['value'] = pd.to_numeric(data['value'], errors="coerce")
+
+#Key indicators to filter from the metadata
+keys = ["Housing Units Completed", 'New Single-family House Sold',
+        'Housing Units Under Construction', 'Housing Units Started',
+        'Housing Units Authorized But Not Started', 'Annual Rate for Housing Units Authorized in Permit-Issuing Places']
