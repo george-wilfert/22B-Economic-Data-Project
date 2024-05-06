@@ -74,4 +74,13 @@ housing_data = data[data['time_series_code'].isin(time_series_codes)]
 housing_data['date'] = pd.to_datetime(housing_data['date'])
 housing_data.sort_values('date', inplace = True)
 
+#function to create plots(repetative)
+def pl_data(data, title, label, color = 'blue'):
+    plt.figure(figsize = (12,6))
+    sns.lineplot(data = data, x = 'date', y = 'value', label = label, color = color)
+    plt.title(title)
+    plt.xlabel('Year')
+    plt.ylabel('Annual Rate')
+    plt.legend()
+    plt.show()
 
