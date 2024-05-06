@@ -84,3 +84,6 @@ def pl_data(data, title, label, color = 'blue'):
     plt.legend()
     plt.show()
 
+#plot for housing units started
+starts = housing_data[housing_data['time_series_code'].str.contains('ASTARTS_TOTAL_US')]
+pl_data(starts, 'Annual Rate for Housing Units Started', 'National Starts')
