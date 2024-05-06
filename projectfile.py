@@ -66,3 +66,12 @@ housing_meta = pd.DataFrame([item[1] for item in filter_meta])
 
 #selects row from the metdata where 'cat_desc' had any of the key indicatoes
 time_series_codes = housing_meta['time_series_code'].tolist()
+
+#new dataframe for the housing indicators
+housing_data = data[data['time_series_code'].isin(time_series_codes)]
+
+#converst the 'date' column so we can ogranize it in chronological order
+housing_data['date'] = pd.to_datetime(housing_data['date'])
+housing_data.sort_values('date', inplace = True)
+
+
