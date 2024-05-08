@@ -87,3 +87,9 @@ def pl_data(data, title, label, color = 'blue'):
 #plot for housing units started
 starts = housing_data[housing_data['time_series_code'].str.contains('ASTARTS_TOTAL_US')]
 pl_data(starts, 'Annual Rate for Housing Units Started', 'National Starts')
+
+#Regonal data for housing using started
+regions = ['NE', 'MW', 'SO', 'WE']
+for region in regions:
+    region_data = housing_data[housing_data['time_series_code'].str.contains(f'ASTARTS_TOTAL_{region}_adj')]
+    sns.lineplot(data = region_data, x = 'date', y = 'value', label = f'{region}')
