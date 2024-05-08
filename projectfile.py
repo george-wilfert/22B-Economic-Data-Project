@@ -93,3 +93,7 @@ regions = ['NE', 'MW', 'SO', 'WE']
 for region in regions:
     region_data = housing_data[housing_data['time_series_code'].str.contains(f'ASTARTS_TOTAL_{region}_adj')]
     sns.lineplot(data = region_data, x = 'date', y = 'value', label = f'{region}')
+
+#Plot for New Single-family Houses Sold (National)
+house_sold = data[data['time_series_code'].str.contains("ASOLD_E_TOTAL_US_adj")]
+pl_data(house_sold, 'Annual Rate for New Single-family Houses Sold', 'National Sales')
