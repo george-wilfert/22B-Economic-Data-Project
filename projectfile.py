@@ -97,3 +97,112 @@ for region in regions:
 #Plot for New Single-family Houses Sold (National)
 house_sold = data[data['time_series_code'].str.contains("ASOLD_E_TOTAL_US_adj")]
 pl_data(house_sold, 'Annual Rate for New Single-family Houses Sold', 'National Sales')
+
+#convert date column to datetime
+data['date'] = pd.to_datetime(data['date'])
+
+#filter housing data to use
+code = ['PERMITS_TOTAL_US','RATE_HOR_US', 'AUTHNOTSTD_TOTAL_US_adj','UNDERCONST_TOTAL_US']
+filter = data[data['time_series_code'].isin(code)]
+
+#create a pivot table
+pivot = filter.pivot_table(index = 'date', columns = 'time_series_code', values = 'value', aggfunc = 'first')
+pivot = pivot.apply(pd.to_numeric, errors = 'coerce').fillna(method = 'ffill')
+
+corr = pivot.corr()
+
+#create Correlation Matrix Visual
+sns.heatmap(corr, annot = True, cmap = 'crest')
+plt.title('Housing Correlation Matrix')
+
+
+# creating dataframes for each one of variables that are wanted to look into
+
+
+# Home ownership rate(%) from 2000 until 2017
+x1 = data[data['time_series_code'].str.contains('RATE_HOR_US')]
+x1 = x1[(x1.date > '2000-01-1')]
+
+# Annual Rate for New Single-family Houses Sold(%) 2000 onwards
+x2 = data[data['time_series_code'].str.contains('ASOLD_E_TOTAL_US')]
+
+# Occupied Housing Units(in thousands) 2000 onwards
+x3 = data[data['time_series_code'].str.contains('ESTIMATE_OCC_US')]
+
+# Estimated Rented Houses(in thousands) 2000 onwards
+x4 = data[data['time_series_code'].str.contains('ESTIMATE_RNTOCC_US')]
+
+#Merging dataframes to get all values into one
+combined_df = pd.merge(x1, x2, on='date', how='outer')
+combined_df = pd.merge(combined_df, x3, on='date', how='outer')
+
+# droping values that dont align with each other and adding revalent column names
+combined_df = combined_df.dropna()
+combined_df = combined_df.drop(columns=["time_series_code_x","time_series_code_y","time_series_code"], axis=1)
+combined_df.rename(columns={"date":"date", "value_x": "Homeownership Rate", "value_y" : "Rate of Houses Sold", "value": "Estimated Occupaied Houses"}, inplace=True)
+
+#merging, dropping, and renaming for additional column
+combined_df = pd.merge(combined_df, x4, on='date', how='outer')
+combined_df = combined_df.drop(columns=["time_series_code"], axis=1)
+combined_df.rename(columns={"value": "Estimated Rented Houses"}, inplace=True)
+
+#copying dataframe to make scatterplot
+scatterdf = combined_df.copy()
+scatterdf['date'] = pd.to_datetime(scatterdf['date'])
+
+#changing date time into int of just the year
+scatterdf['date'] = scatterdf['date'].dt.year
+
+#subtracting a date so you can increment graph by just one year rather than datetime
+start = 2000
+scatterdf['date'] = scatterdf['date'] - start
+print(scatterdf)
+# print out 3d scatterplot showing rate of houses sold, homeownership rate,
+# and the date together and relationship
+
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+ax.scatter(scatterdf['Rate of Houses Sold'], scatterdf['date'], scatterdf['Homeownership Rate'], color = "green")
+
+plt.show()
+
+#Training data on only pre 2015 data to test against 2017 data for model accuracy
+#9 values in test 58 in training
+training = combined_df[combined_df['date'] < '2015-01-01']
+test = combined_df[combined_df['date'] > '2015-01-01']
+
+#spitting up the variables into predictors and predicted to see if there is correlation
+training_predictors = training[["Homeownership Rate", "Rate of Houses Sold", "Estimated Rented Houses"]]
+training_predicted = training["Estimated Occupaied Houses"]
+
+test_predictors = test[["Homeownership Rate", "Rate of Houses Sold", "Estimated Rented Houses"]]
+test_predicted = test["Estimated Occupaied Houses"]
+
+#creating model and fitting model after we predict values based on test data
+model = LinearRegression()
+model.fit(training_predictors, training_predicted)
+
+predicted_from_training_model = model.predict(test_predictors)
+#shows mean squared error
+mse = mean_squared_error(test_predicted,predicted_from_training_model)
+print(mse)
+
+#plot the data to make it easier to see
+plt.scatter(test_predicted, predicted_from_training_model, color='green')
+plt.plot(test_predicted, test_predicted, color='black')
+
+plt.title('Actual vs. Predicted')
+plt.xlabel('Actual')
+plt.ylabel('Predicted')
+plt.show()
+
+#show the rediuals and shows over time the model will degrade
+residuals = test_predicted - predicted_from_training_model
+print(residuals)
+
+#getting r2 score
+r2 = r2_score(test_predicted, predicted_from_training_model)
+print(r2)
+
+# A r2 score of .78 is regarded as strong linear fit for the model
+
