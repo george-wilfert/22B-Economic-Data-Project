@@ -9,7 +9,7 @@ from datetime import *
 from mpl_toolkits.mplot3d import Axes3D
 
 #3d Model
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error,r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import mpl_toolkits.mplot3d
@@ -61,11 +61,10 @@ keys = ["Housing Units Completed", 'New Single-family House Sold',
         'Housing Units Authorized But Not Started', 'Annual Rate for Housing Units Authorized in Permit-Issuing Places']
 
 #any() returns True or False checks if key word is in in the row and then creating a new df
-filter_meta = filter(lambda x: any(key in x[1]['cat_desc'] for key in keys),meta_data.iterrows())
-housing_meta = pd.DataFrame([item[1] for item in filter_meta])
+filter_meta = meta_data[meta_data['cat_desc'].apply(lambda x: any(key in x for key in keys))]
 
 #selects row from the metdata where 'cat_desc' had any of the key indicatoes
-time_series_codes = housing_meta['time_series_code'].tolist()
+time_series_codes = list(filter_meta['time_series_code'])
 
 #new dataframe for the housing indicators
 housing_data = data[data['time_series_code'].isin(time_series_codes)]
@@ -185,7 +184,7 @@ model.fit(training_predictors, training_predicted)
 predicted_from_training_model = model.predict(test_predictors)
 #shows mean squared error
 mse = mean_squared_error(test_predicted,predicted_from_training_model)
-print(mse)
+print("Mean Squared Error:", mse)
 
 #plot the data to make it easier to see
 plt.scatter(test_predicted, predicted_from_training_model, color='green')
@@ -198,11 +197,8 @@ plt.show()
 
 #show the rediuals and shows over time the model will degrade
 residuals = test_predicted - predicted_from_training_model
-print(residuals)
+print("Resuidals:", residuals)
 
 #getting r2 score
 r2 = r2_score(test_predicted, predicted_from_training_model)
-print(r2)
-
-# A r2 score of .78 is regarded as strong linear fit for the model
-
+print("R-Sqaured Value", r2)
